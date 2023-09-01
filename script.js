@@ -113,62 +113,85 @@ document.addEventListener("DOMContentLoaded", async function () {
   setInterval(fetchData, 3000);
 });
 
+
+
+// RELAYS states
 document.addEventListener("DOMContentLoaded", async function () {
-  // Function to send the updated key states to the server
-  async function sendKeyStates(relays) {
-    // Check if there's a stored token from the login
-    const storedToken = window.localStorage.getItem("token");
+  // Check if we are on the dashboard page
+  if (window.location.pathname === "/dashboard/index.html") {
+    // Function to send all relay states to the server
+    async function sendAllRelayStates(relays) {
+      // Check if there's a stored token from the login
+      const storedToken = window.localStorage.getItem("token");
 
-    if (storedToken) {
-      // Make a POST request to update key states
-      try {
-        const uid = document.getElementById("DEVICE").textContent; // Get the device UID
-        const response = await fetch(`http://185.230.163.241:8000/api/1/${uid}/relays/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Token ${storedToken}`,
-          },
-          body: JSON.stringify(relays), // Send the updated relay states
-        });
+      if (storedToken) {
+        // Make a POST request to update all relay states
+        try {
+          const uid = document.getElementById("DEVICE").textContent; // Get the device UID
+          const response = await fetch(`http://185.230.163.241:8000/api/1/${uid}/relays/`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Token ${storedToken}`,
+            },
+            body: JSON.stringify(relays), // Send all relay states
+          });
 
-        if (response.ok) {
-          // Successfully updated the key states
-          alert("Key states updated successfully.");
-        } else {
-          console.error("Failed to update key states");
+          if (response.ok) {
+            // Successfully updated the relay states
+            alert("All relay states updated successfully.");
+          } else {
+            console.error("Failed to update relay states");
+          }
+        } catch (error) {
+          console.error("An error occurred:", error);
         }
-      } catch (error) {
-        console.error("An error occurred:", error);
+      } else {
+        console.error("No token found. Please log in.");
       }
-    } else {
-      console.error("No token found. Please log in.");
     }
+
+    // Event listeners for changes in all relay states (checkboxes)
+    document.getElementById("REL1").addEventListener("change", function () {
+      const relays = {
+        rel1: this.checked,
+        rel2: document.getElementById("REL2").checked,
+        rel3: document.getElementById("REL3").checked,
+        rel4: document.getElementById("REL4").checked,
+      };
+      sendAllRelayStates(relays);
+    });
+
+    document.getElementById("REL2").addEventListener("change", function () {
+      const relays = {
+        rel1: document.getElementById("REL1").checked,
+        rel2: this.checked,
+        rel3: document.getElementById("REL3").checked,
+        rel4: document.getElementById("REL4").checked,
+      };
+      sendAllRelayStates(relays);
+    });
+
+    document.getElementById("REL3").addEventListener("change", function () {
+      const relays = {
+        rel1: document.getElementById("REL1").checked,
+        rel2: document.getElementById("REL2").checked,
+        rel3: this.checked,
+        rel4: document.getElementById("REL4").checked,
+      };
+      sendAllRelayStates(relays);
+    });
+
+    document.getElementById("REL4").addEventListener("change", function () {
+      const relays = {
+        rel1: document.getElementById("REL1").checked,
+        rel2: document.getElementById("REL2").checked,
+        rel3: document.getElementById("REL3").checked,
+        rel4: this.checked,
+      };
+      sendAllRelayStates(relays);
+    });
   }
-
-  // Event listeners for changes in key states (checkboxes)
-  document.getElementById("REL1").addEventListener("change", function () {
-    const rel1State = this.checked;
-    const relays = { rel1: rel1State };
-    sendKeyStates(relays);
-  });
-
-  document.getElementById("REL2").addEventListener("change", function () {
-    const rel2State = this.checked;
-    const relays = { rel2: rel2State };
-    sendKeyStates(relays);
-  });
-
-  document.getElementById("REL3").addEventListener("change", function () {
-    const rel3State = this.checked;
-    const relays = { rel3: rel3State };
-    sendKeyStates(relays);
-  });
-
-  document.getElementById("REL4").addEventListener("change", function () {
-    const rel4State = this.checked;
-    const relays = { rel4: rel4State };
-    sendKeyStates(relays);
-  });
 });
+
 
