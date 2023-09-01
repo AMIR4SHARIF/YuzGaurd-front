@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const data = await response.json();
         const token = data.token;
         window.localStorage.setItem("token", token); // Store the token in localStorage
+        window.localStorage.setItem("username", username); // Store the username in localStorage
 
         // Redirect to the dashboard page
         window.location.href = "../dashboard";
@@ -62,3 +63,112 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+
+document.addEventListener("DOMContentLoaded", async function () {
+  // Function to fetch and update data
+  async function fetchData() {
+    // Check if there's a stored token from the login
+    const storedToken = window.localStorage.getItem("token");
+    const storedUsername = window.localStorage.getItem("username");
+    if (storedToken) {
+      // Make a GET request to fetch device details
+      try {
+        const response = await fetch("http://185.230.163.241:8000/devices/", {
+          method: "GET",
+          headers: {
+            "Authorization": `Token ${storedToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const device = data.devices[0]; // Get the first device
+
+          // Update HTML elements with the parsed data
+          document.getElementById("USER").textContent = storedUsername; // Use the stored token as the username
+          document.getElementById("DEVICE").textContent = device.uid;
+          document.getElementById("TEMP").textContent = device.sensors.temp.toFixed(2);
+          document.getElementById("HUMID").textContent = device.sensors.humid.toFixed(2);
+          document.getElementById("GAS").textContent = device.sensors.smk;
+          document.getElementById("REL1").checked = device.relays.rel1;
+          document.getElementById("REL2").checked = device.relays.rel2;
+          document.getElementById("REL3").checked = device.relays.rel3;
+          document.getElementById("REL4").checked = device.relays.rel4;
+        } else {
+          console.error("Failed to fetch device details");
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    } else {
+      console.error("No token found. Please log in.");
+    }
+  }
+
+  // Initial fetch
+  fetchData();
+
+  // Update data every 3 seconds
+  setInterval(fetchData, 3000);
+});
+
+document.addEventListener("DOMContentLoaded", async function () {
+  // Function to send the updated key states to the server
+  async function sendKeyStates(relays) {
+    // Check if there's a stored token from the login
+    const storedToken = window.localStorage.getItem("token");
+
+    if (storedToken) {
+      // Make a POST request to update key states
+      try {
+        const uid = document.getElementById("DEVICE").textContent; // Get the device UID
+        const response = await fetch(`http://185.230.163.241:8000/api/1/${uid}/relays/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Token ${storedToken}`,
+          },
+          body: JSON.stringify(relays), // Send the updated relay states
+        });
+
+        if (response.ok) {
+          // Successfully updated the key states
+          alert("Key states updated successfully.");
+        } else {
+          console.error("Failed to update key states");
+        }
+      } catch (error) {
+        console.error("An error occurred:", error);
+      }
+    } else {
+      console.error("No token found. Please log in.");
+    }
+  }
+
+  // Event listeners for changes in key states (checkboxes)
+  document.getElementById("REL1").addEventListener("change", function () {
+    const rel1State = this.checked;
+    const relays = { rel1: rel1State };
+    sendKeyStates(relays);
+  });
+
+  document.getElementById("REL2").addEventListener("change", function () {
+    const rel2State = this.checked;
+    const relays = { rel2: rel2State };
+    sendKeyStates(relays);
+  });
+
+  document.getElementById("REL3").addEventListener("change", function () {
+    const rel3State = this.checked;
+    const relays = { rel3: rel3State };
+    sendKeyStates(relays);
+  });
+
+  document.getElementById("REL4").addEventListener("change", function () {
+    const rel4State = this.checked;
+    const relays = { rel4: rel4State };
+    sendKeyStates(relays);
+  });
+});
+

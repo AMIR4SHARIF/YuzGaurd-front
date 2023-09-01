@@ -282,7 +282,7 @@ text-transform: uppercase;
     justify-content: space-around;
     gap: 22px;
 }
-#REL1 , #REL2 , #REL3 , #REL4{
+.REL-text{
 font-style: normal;
 font-weight: 700;
 font-size: 26px;
