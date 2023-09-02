@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (response.ok) {
           const data = await response.json();
           const device = data.devices[0]; // Get the first device
+          window.localStorage.setItem("uid",device.uid);
 
           // Update HTML elements with the parsed data
           document.getElementById("USER").textContent = storedUsername; 
@@ -54,12 +55,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     async function sendAllRelayStates(relays) {
       // Check if there's a stored token from the login
       const storedToken = window.localStorage.getItem("token");
-
+      const storedUid = window.localStorage.getItem("uid");
       if (storedToken) {
         // Make a POST request to update all relay states
         try {
-          const uid = document.getElementById("DEVICE").textContent; // Get the device UID
-          const response = await fetch(`http://185.230.163.241:8000/api/1/${uid}/relays/`, {
+          const response = await fetch(`http://185.230.163.241:8000/api/1/${storedUid}/relays/`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
