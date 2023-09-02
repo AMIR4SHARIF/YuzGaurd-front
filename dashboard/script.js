@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", async function () {
           const device = data.devices[0]; // Get the first device
 
           // Update HTML elements with the parsed data
-          document.getElementById("USER").textContent = storedUsername; // Use the stored token as the username
-          document.getElementById("DEVICE").textContent = device.uid;
+          document.getElementById("USER").textContent = storedUsername; 
+          document.getElementById("DEVICE").textContent = device.uid.slice(0, 10);
           document.getElementById("TEMP").textContent = device.sensors.temp.toFixed(2);
           document.getElementById("HUMID").textContent = device.sensors.humid.toFixed(2);
           document.getElementById("GAS").textContent = device.sensors.smk;
